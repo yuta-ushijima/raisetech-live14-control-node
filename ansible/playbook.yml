@@ -28,18 +28,28 @@
       state: present
       line:
         eval "$(nodenv init -)"
+  
   - name: reboot shell
     ansible.builtin.reboot:
+  
   - name: Create nodenv/plugins directory
     become: no
     ansible.builtin.file:
       path: ~/.nodenv/plugins/node-build
       state: directory
+  
   - name: Clone node-build repo to nodenv/plugins
     become: no
     ansible.builtin.git:
       repo: https://github.com/nodenv/node-build.git
       dest: ~/.nodenv/plugins/node-build
+  
+  - name: check node installed version
+    become: no
+    shell: bash -lc "nodenv versions"
+    register: exist_installed_specified_node_version
+  
   - name: Install specified node version by nodenv
     become: no
     shell: bash -lc "nodenv install 10.13.0"
+    when: not exist_installed_specified_node_version.stdout == '  10.13.0'
