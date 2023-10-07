@@ -1,5 +1,5 @@
 ---
-- hosts: 35.77.201.189
+- hosts: 54.249.79.236
   become: yes
   tasks:
   - name: Ping to target node
@@ -43,6 +43,3 @@
   - name: Install specified node version by nodenv
     become: no
     shell: bash -lc "nodenv install 10.13.0"
-
-      
-  
