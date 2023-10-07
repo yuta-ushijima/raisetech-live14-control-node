@@ -1,0 +1,48 @@
+---
+- hosts: 35.77.201.189
+  become: yes
+  tasks:
+  - name: Ping to target node
+    ansible.builtin.ping:
+      data: 'Ping成功！！！'
+  - name: Install Git to target node
+    ansible.builtin.yum:
+      name: git
+      state: latest
+  - name: Clone Nodenv repo
+    become: no
+    ansible.builtin.git:
+      repo: https://github.com/nodenv/nodenv.git
+      dest: ~/.nodenv
+  - name: Write nodenv path to bash_profile
+    become: no
+    ansible.builtin.lineinfile:
+      dest: ~/.bash_profile
+      state: present
+      line:
+        export PATH="$HOME/.nodenv/bin:$PATH"
+  - name: eval init nodenv to bash_profile
+    become: no
+    ansible.builtin.lineinfile:
+      dest: ~/.bash_profile
+      state: present
+      line:
+        eval "$(nodenv init -)"
+  - name: reboot shell
+    ansible.builtin.reboot:
+  - name: Create nodenv/plugins directory
+    become: no
+    ansible.builtin.file:
+      path: ~/.nodenv/plugins/node-build
+      state: directory
+  - name: Clone node-build repo to nodenv/plugins
+    become: no
+    ansible.builtin.git:
+      repo: https://github.com/nodenv/node-build.git
+      dest: ~/.nodenv/plugins/node-build
+  - name: Install specified node version by nodenv
+    become: no
+    shell: bash -lc "nodenv install 10.13.0"
+
+      
+  
