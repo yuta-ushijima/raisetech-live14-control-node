@@ -4,6 +4,7 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@4.1.1
+  ansible-playbook: orbss/ansible-playbook@0.0.5
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
@@ -21,6 +22,13 @@ jobs:
           command: |
             set -x
             aws cloudformation deploy --template-file cloudformation/sample.yaml --stack-name sample-stack
+  execute-ansible:
+    executor: ansible-playbook/default
+    steps:
+      - checkout
+      - ansible-playbook/install:
+          version: 2.15.0
+
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
@@ -28,3 +36,6 @@ workflows:
   devops-workflow:
     jobs:
       - execute-cfn
+      - execute-ansible:
+          requires:
+            - execute-cfn
